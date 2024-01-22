@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create AWS Cognito User Pool for Amazon Q Business proof-of-concept
+
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F78
+            reason: CFN intended for proof-of-concept. SMS may not be available for MFA yet.
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-user-pool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      MfaConfiguration: "OFF"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireNumbers: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: !Sub ${AWS::StackName}-client
+      GenerateSecret: true
+      ExplicitAuthFlows:
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+      PreventUserExistenceErrors: "ENABLED"
+      AllowedOAuthFlows: 
+        - code
+      AllowedOAuthFlowsUserPoolClient: True
+      AllowedOAuthScopes:
+        - openid
+        - email
+        - profile
+      CallbackURLs:
+        - !Ref AppCallbackURL
+      LogoutURLs:
+        - !Ref AppLogoutURL
+      SupportedIdentityProviders:
+        - COGNITO
+    DependsOn:
+      - UserPool
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref UserPool
+      Domain: !Join
+        - '-'
+        - - !Ref AWS::StackName
+          - !Select [1, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]
+    DependsOn:
+      - UserPool
+
+Parameters:
+  AppCallbackURL:
+    Type: String
+    Default: 'http://localhost:8080/authorization-code/callback'
+    Description: Application url for Cognito to callback after authentication
+  AppLogoutURL:
+    Type: String
+    Default: 'http://localhost:8080/logout'
+    Description: Application url to logout user
+
+Outputs:
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref UserPool
+  UserPoolDomainName:
+    Description: Cognito User Pool Domain Name
+    Value: !Sub '${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com'
+  IssuerURL:
+    Description: Issuer URL
+    Value: !GetAtt UserPool.ProviderURL
+  OAuthURL:
+    Description: OAuth URL
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com'
+  ClientId:
+    Description: Client ID
+    Value: !GetAtt UserPoolClient.ClientId
+  ClientSecret:
+    Description: Client Secret
+    Value: !GetAtt UserPoolClient.ClientSecret

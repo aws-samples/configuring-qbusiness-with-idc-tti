@@ -1,0 +1,93 @@
+Resources:
+  QBusinessSTSAssumeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref ClientAppExecutionArn
+            Action:
+              - sts:AssumeRole
+              - sts:SetContext
+      Policies:
+        - PolicyName: QBusinessAPIAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: QBusinessConversationPermission
+                Effect: Allow
+                Action:
+                  - qbusiness:Chat
+                  - qbusiness:ChatSync
+                  - qbusiness:ListMessages
+                  - qbusiness:ListConversations
+                  - qbusiness:DeleteConversation
+                  - qbusiness:PutFeedback
+                  - qbusiness:GetWebExperience
+                  - qbusiness:GetApplication
+                  - qbusiness:ListPlugins
+                  - qbusiness:GetChatControlsConfiguration
+                Resource: !Join
+                  - '/'
+                  - - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application
+                    - !Ref QBApplicationId
+              - Sid: QBusinessKMSDecryptPermissions
+                Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: !Join
+                  - '/'
+                  - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key
+                    - !Ref KMSKeyId
+                Condition:
+                  StringLike:
+                    kms:ViaService:
+                      - !Sub qbusiness.${AWS::Region}.amazonaws.com
+  
+  ClientAppExecutionAddOnPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Add on policy for invoking CreateTokenWithIAM and STS AssumeRole
+      Path: "/"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSTSAssumeRole
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Resource: !GetAtt QBusinessSTSAssumeRole.Arn
+          - Sid: AllowCreateTokenWithIam
+            Effect: Allow
+            Action:
+              - sso-oauth:CreateTokenWithIAM
+            Resource:
+              - !Ref IDCApiAppArn
+
+Parameters:
+  QBApplicationId:
+    Type: String
+    Default: <qbusiness_application_id>
+    Description: Application ID of the Amazon Q Business that requires API access enabled
+  KMSKeyId:
+    Type: String
+    Default: key_id
+    Description: '[Optional] KMS Key ID for Amazon Q Business API access'
+  ClientAppExecutionArn:
+    Type: String
+    Default: <iam_user_or_role_arn>
+    Description: ARN of AWS IAM user/role/execution-role that will invoke IDC to exchange identity token and invoke Amazon Q Business API
+  IDCApiAppArn:
+    Type: String
+    Default: arn:aws:sso::<aws_account>:application/ssoins-<idc_instance_id>/apl-<idc_customer_managed_application_id>
+    Description: ARN of IDC custom auth provider application
+
+Outputs:
+  QBusinessSTSAssumeRoleArn:
+    Description: AWS IAM assume role Arn for STS Assume Role command to get temp credential to invoke Q Business APIs
+    Value: !GetAtt QBusinessSTSAssumeRole.Arn
+  ClientAppExecutionAddOnPolicyArn:
+    Description: Add-on policy ARN to be attached to client application execution role/user to give AssumeRole and CreateTokenWithIAM
+    Value: !GetAtt ClientAppExecutionAddOnPolicy.PolicyArn

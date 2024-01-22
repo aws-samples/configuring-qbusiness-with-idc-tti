@@ -1,0 +1,4 @@
+[flake8]
+# W293: Blank lines should not contain any tabs or spaces
+# E501: Line too long (> 79 characters)
+ignore = W293,E501

@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "amazon-q-business-api-tools"
+version = "0.1.0"
+description = "API helpers and demo for Aamzon Q Business Expert"
+authors = ["Rajesh Kumar Ravi <ravizraj@amazon.com>"]
+license = "MIT No Attribution License (MIT-0)"
+readme = "README.md"
+packages = [
+    { include = "qbapi_tools", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+boto3 = "^1.34.24"
+pydantic = "^2.5.3"
+flask = "^3.0.3"
+flask-login = "^0.6.3"
+requests = "^2.31.0"
+pyjwt = "^2.8.0"
+python-dotenv = "^1.0.1"
+rich = "^13.7.1"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.0.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

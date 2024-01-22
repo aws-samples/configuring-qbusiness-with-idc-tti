@@ -1,0 +1,29 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div>
+    <h2>My Conversations</h2>
+    <p>Hello, <span>{{ user.name }}</span>. Below is a list of current active Amazon Q Business conversations.
+    </p>
+
+</div>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Conversation Id</th>
+        <th>Title</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for conversation in conversations %}
+    <tr>
+        <td>{{ conversation.conversationId }}</td>
+        <td id="claim-{{ conversation.conversationId }}">
+            {{ conversation.title }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}
