@@ -7,8 +7,11 @@ Compilation of tutorials and guides to help with using Amazon Q Business identit
 
 ## Tutorials and guides
 
-### Configuring Amazon Q Business with Okta
+### Configuring Amazon Q Business with Entra
+* Guide: [Register web application with Entra](./tutorials/entra/register-webapp-with-entra.md)
 
+### Configuring Amazon Q Business with Okta
 * End-to-end tutorial: [Configuring sample web application with Okta](./tutorials/okta/config-webapp-using-okta.md)
 * Guide: [Register web application with Okta](./tutorials/okta/register-webapp-with-okta.md)
 * Guide: [How to find Okta authorization servers Issuer URI](./tutorials/okta/find-okta-issuer-url.md)
+
