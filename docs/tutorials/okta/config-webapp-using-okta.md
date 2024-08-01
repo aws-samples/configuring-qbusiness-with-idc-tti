@@ -17,6 +17,7 @@ web application with Okta as external identity provider.
     * **Default Okta Issuer URL:** `https://${okta_domain}/oauth2/default`
     * Note `Client ID`, `Client Secret`, `Audience ID`, and `Issuer URL`
 3. Create Amazon Q Business integrating with IDC instance above and use `File Upload` or `S3` connector to index few sample files for query.
+    * Setup user subscription. Ensure the user is same as user created in step 1 above.
     * Try the built-in Amazon Q Business web experience and try asking information from indexed documents.
     * From the application details page note the `Application ID`
 4. Clone this repo and setup the application environment using poetry.
@@ -55,7 +56,7 @@ Make a copy of `<project_home>/webapp/config/.env.okta.dist` file and rename it 
 
 #### Application configuration
 * **idc_provider_apl_arn:** Use the `IDC Application ARN` output by CFN for Deploying Trusted token issuer (TTI).
-* **qb_sts_role:** Use the `IDC Application ARN` output by CFN for  Deploying IAM Roles required by sample web application CFN.
+* **qb_sts_role:** Use the `STS Assume Role` output by CFN for Deploying IAM Roles required by sample web application CFN.
 * **qb_apl_id:** Use the Amazon Q Business `Application ID` from step-3 in initial setup above.
 * **app_domain:**  Use `localhost:8080`.
 * **region_name:** Use the AWS Region where your Q Business application and IDC is deployed. Example, `us-east-1` or `us-west-2`.
