@@ -9,10 +9,10 @@ web application with Okta as external identity provider.
     * Sign-in to to Okta and navigate to `Admin` dashboard.
     * Add same sample users to Okta as needed.
     * Ensure the user email address attribute is configured for the user.
-    * Follow the steps listed at [Create an OIDC Web App in the Okta Admin Console](https://support.okta.com/help/s/article/create-an-oidc-web-app-in-dashboard?language=en_US) to register your application.
+    * Follow the steps listed at [Register web application with Okta](./register-webapp-with-okta.md) to register your sample web application with Okta.
     * **Callback URL:** `http://localhost:8080/authorization-code/callback`
     * **Logout URL:** `http://localhost:8080/logout`
-    * **Default Okta Issuer URL:** `https://${okta_domain}/oauth2/default`
+    * **Default Okta Issuer URL:** `https://<okta_domain>/oauth2/default`
     * Note `Client ID`, `Client Secret`, `Audience ID`, and `Issuer URL`
         * For most default deployments, `Audience ID` is same as `Client ID`
 2. Enable AWS IAM Identity Center instance (Identity Center).
