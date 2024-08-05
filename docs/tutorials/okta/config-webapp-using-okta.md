@@ -13,6 +13,7 @@ web application with Okta as external identity provider.
     * **Callback URL:** `http://localhost:8080/authorization-code/callback`
     * **Logout URL:** `http://localhost:8080/logout`
     * **Default Okta Issuer URL:** `https://<okta_domain>/oauth2/default`
+        * For more info see: [How to find Okta Issuer URI](./find-entra-issuer-url.md)
     * Note `Client ID`, `Client Secret`, `Audience ID`, and `Issuer URL`
         * For most default deployments, `Audience ID` is same as `Client ID`
 2. Enable AWS IAM Identity Center instance (Identity Center).

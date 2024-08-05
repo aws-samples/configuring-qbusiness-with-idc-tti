@@ -1,4 +1,4 @@
-# How to find Okta authorization servers Issuer URI
+# How to find Okta Issuer URI
 
 You will require to know the Okta issuer URI when configuring trusted identity propagation. Here are the steps to find Okta authorization servers Issuer URI.
 
