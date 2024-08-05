@@ -22,5 +22,5 @@ See [How to find Microsoft Entra Issuer URI](./find-entra-issuer-url.md) to obta
 4. Select `Overview` side menu item and expand `Essentials` section.
     * Note the `Application (client) ID` as this will be the `Client ID` and `Audience` for your web integration. Also note the `Directory (tenant) ID` as this is the application `Tenant ID` for use with issuer URI above.
     ![entra-client-id](../../images/entra-client-id.png)
-5. From `Overview > Essentials` section, click on link for `Redirect URIs` and verify if the callback logout URL is configured correctly as shown in image below.
+5. From `Overview > Essentials` section, click on link for `Redirect URIs` in configured correctly as shown in image below. Logout URL is optional and can be ignored for sample web application.
     * ![entra-callback-uri](../../../docs/images/entra-callback-uri.png)

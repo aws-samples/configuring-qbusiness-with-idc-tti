@@ -8,10 +8,9 @@ This tutorial will provide step-by-step instructions to deploy the sample web ap
     * Sign in to your [Microsoft Entra admin center](https://entra.microsoft.com/).
     * Add sample users to Entra
     * Ensure the user email address attribute is configured for the user.
-    * Follow the steps listed at [Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app?tabs=certificate#register-an-application) to register your application.
-        * For more info see: [Register web application with Microsoft Entra](./register-webapp-with-entra.md)
+    * Follow the steps listed at [Register web application with Microsoft Entra](./register-webapp-with-entra.md) to register your sample web application.
     * **Callback URL:** `http://localhost:8080/authorization-code/callback`
-    * **Logout URL:** `http://localhost:8080/logout`
+    * **Logout URL (Optional):** Entra will accept only `https` protocol. (Example, `https://localhost:8080/logout`)
     * **Default Entra Issuer URL:** `https://login.microsoftonline.com/<tenant-id>/v2.0`
         * For more info see: [How to find Microsoft Entra Issuer URI](./find-entra-issuer-url.md)
     * Note `Client ID`, `Client Secret`, `Audience ID`, and `Issuer URL`
