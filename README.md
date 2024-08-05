@@ -1,10 +1,25 @@
 # Amazon Q Business API Tools
 
-This project aims to provide sample [Amazon Q Business](https://console.aws.amazon.com/amazonq/home) API code to help getting started with simple tasks such as list applications, indexes and conversations, and running simple chat commands. The sample also covers using Trusted Token Issuer to implement identity-aware SigV4 signed Q Business APIs.
+This project aims to provide sample [Amazon Q Business](https://console.aws.amazon.com/amazonq/home) API code to help getting started with simple tasks such as list applications, indexes and conversations, and running simple chat commands. The sample also covers using Trusted Token Issuer (TTI) to implement identity-aware SigV4 signed Q Business APIs.
 
-For more information see [Overview of Amazon Q Business with AWS IAM Identity Center trusted identity propagation](/docs/tutorials/idc/intro-idc-tti.md)
+For more information see AWS blog [https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/](https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/)
 
 ![Trusted Token Issuer Architecture](/docs/images/q-api-tte-arch.png)
+
+## Where to begin
+This repository can be leveraged in multiple ways.
+
+1. Checkout **end-to-end tutorials**, if you want to learn how to use identity-aware API with Identity Center and your OIDC identity provider (Okta, Microsoft Entra).
+    * Microsoft Entra tutorial: [Configuring sample web application with Microsoft Entra](./docs/tutorials/entra/config-webapp-using-entra.md)
+    * Okta tutorial: [Configuring sample web application with Okta](./docs/tutorials/okta/config-webapp-using-okta.md)
+
+2. Explore included [CloudFormation templates](./cf/README.md), if you are looking to automate configuring TTI in your Identity Center Instance.
+
+3. Try included Python [info.py](./samples/info.py) sample to learn how to use Q Business APIs for common admin tasks such as list applications, indexed files, etc.
+
+4. Try included Python [chat.py](./samples/info.py) sample to learn how to use Q Business `legacy` Chat APIs for tasks such as listing conversations, delete conversations, chat, etc.
+
+Remember to follow steps in `Repository Setup` section below to install required Python libraries.
 
 ## Project Files Overview
 This code samples is organized into following sections.

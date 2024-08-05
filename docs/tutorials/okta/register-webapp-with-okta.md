@@ -2,6 +2,8 @@
 
 Use the steps listed by [Create an OIDC Web App in the Okta Admin Console](https://support.okta.com/help/s/article/create-an-oidc-web-app-in-dashboard?language=en_US) to register your application. For the sample web application included in this repository, use the following callback and logout urls as default. You can update domain name and port as needed later.
 
+* **Sign-in method:** OIDC - OpenID Connect
+* **Application type:** Web Application
 * **Callback URL:** `http://localhost:8080/authorization-code/callback`
 * **Logout URL:** `http://localhost:8080/logout`
 
