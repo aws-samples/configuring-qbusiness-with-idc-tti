@@ -2,7 +2,7 @@
 
 This project aims to provide sample [Amazon Q Business](https://console.aws.amazon.com/amazonq/home) API code to help getting started with simple tasks such as list applications, indexes and conversations, and running simple chat commands. The sample also covers using Trusted Token Issuer (TTI) to implement identity-aware SigV4 signed Q Business APIs.
 
-For more information see AWS blog [https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/](https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/)
+For more information see AWS Blog [Configure Amazon Q Business with AWS IAM Identity Center trusted identity propagation](https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/)
 
 ![Trusted Token Issuer Architecture](/docs/images/q-api-tte-arch.png)
 
