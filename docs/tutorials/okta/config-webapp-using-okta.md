@@ -22,7 +22,7 @@ web application with Okta as external identity provider.
         * Ensure user email attribute is included in the synced attribute list.
     * From the Identity Center settings note the `IDC Instance ARN`.
 3. Create Amazon Q Business integrating with Identity Center instance above and use `File Upload` or `S3` connector to index few sample files for query.
-    * Setup user subscription. Ensure the user is same as user created in step 1 above.
+    * Setup user subscription. Ensure the user is same as user created in _step 1_ above.
     * Try the built-in Amazon Q Business web experience and try asking information from indexed documents.
     * From the application details page note the `Application ID`
 4. Clone this repo and setup the application environment using poetry.
