@@ -6,7 +6,7 @@ This tutorial will provide step-by-step instructions to deploy the sample web ap
 1. Register your web application with your Entra account.
     * Create an Entra account, if you do not already have an Entra account. You will need minimum `Microsoft Entra ID P1 plan` for SCIM support.
     * Sign in to your [Microsoft Entra admin center](https://entra.microsoft.com/).
-    * Add sample users to Entra
+    * Add sample users to Entra, if required.
     * Ensure the user email address attribute is configured for the user.
     * Follow the steps listed at [Register web application with Microsoft Entra](./register-webapp-with-entra.md) to register your sample web application.
     * **Callback URL:** `http://localhost:8080/authorization-code/callback`
@@ -18,9 +18,9 @@ This tutorial will provide step-by-step instructions to deploy the sample web ap
 2. Enable AWS IAM Identity Center instance (Identity Center).
     * Add same sample users (email address) to Identity Center as added to Entra is _Step 1_.
         * Ensure the user email address in Entra matches Identity Center, including case.
-    * **_Alternatively_**, follow [Configure SAML and SCIM with Microsoft Entra ID and IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/idp-microsoft-entra.html) to automatically sync users between Entra and Identity Center.
+    * **_Auto Sync Users:_** Alternatively, follow [Configure SAML and SCIM with Microsoft Entra ID and IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/idp-microsoft-entra.html) to automatically sync users between Entra and Identity Center.
         * Ensure user email attribute is included in the synced attribute list.
-    * From the Identity Center settings note the `IDC Instance ARN`.
+    * From the Identity Center settings, note the `IDC Instance ARN`.
 3. Create Amazon Q Business integrating with Identity Center instance above and use `File Upload` or `S3` connector to index few sample files for query.
     * Try the built-in Amazon Q Business web experience and try asking information from indexed documents.
     * From the application details page note the `Application ID`
@@ -67,6 +67,7 @@ Make a copy of `<project_home>/webapp/config/.env.entra.dist` file and rename it
 
 ## 5/ Launching sample web application
 * From your command line interface change folder to `<project_home>`
+* Install project libraries using Poetry. See `Repository Setup` section in [Project README](../../../README.md) for more information.
 * Ensure your AWS CLI access is configured with `IAM User/Role` from _Step 4_ in initial setup above.
 * Ensure AWS CLI is working properly by executing any CLI command. Example, `aws qbusiness list-applications`.
 * Launch web application using command: `poetry run python webapp/main.py`

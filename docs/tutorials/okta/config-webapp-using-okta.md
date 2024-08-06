@@ -17,11 +17,11 @@ web application with Okta as external identity provider.
     * Note `Client ID`, `Client Secret`, `Audience ID`, and `Issuer URL`
         * For most default deployments, `Audience ID` is same as `Client ID`
 2. Enable AWS IAM Identity Center instance (Identity Center).
-    * Add sample users to Identity Center.
+    * Add same sample users (email address) to Identity Center as added to Okta is _Step 1_.
         * Ensure the user email address in Okta matches Identity Center, including case.
-    * **_Alternatively_**, follow [Configure SAML and SCIM with Okta and IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/gs-okta.html) to automatically sync users between Okta and Identity Center.
+    * **_Auto Sync Users:_** Alternatively, follow [Configure SAML and SCIM with Okta and IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/gs-okta.html) to automatically sync users between Okta and Identity Center.
         * Ensure user email attribute is included in the synced attribute list.
-    * From the Identity Center settings note the `IDC Instance ARN`.
+    * From the Identity Center settings, note the `IDC Instance ARN`.
 3. Create Amazon Q Business integrating with Identity Center instance above and use `File Upload` or `S3` connector to index few sample files for query.
     * Setup user subscription. Ensure the user is same as user created in _step 1_ above.
     * Try the built-in Amazon Q Business web experience and try asking information from indexed documents.
@@ -69,6 +69,7 @@ Make a copy of `<project_home>/webapp/config/.env.okta.dist` file and rename it 
 
 ## 5/ Launching sample web application
 * From your command line interface change folder to `<project_home>`
+* Install project libraries using Poetry. See `Repository Setup` section in [Project README](../../../README.md) for more information.
 * Ensure your AWS CLI access is configured with `IAM User/Role` from _step 4_ in initial setup above.
 * Ensure AWS CLI is working properly by executing any CLI command. Example, `aws qbusiness list-applications`.
 * Launch web application using command: `poetry run python webapp/main.py`

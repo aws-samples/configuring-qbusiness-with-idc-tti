@@ -1,36 +1,37 @@
-# Sample web application to demonstrate Trusted Token Propagation flow
+# Sample web application to demonstrate Trusted Token Propagation with AWS IAM Identity Center
 
-You can use this sample web application to see demonstrate how Trusted Token Propagation Authorization Flow works.
+You can use this sample web application to see demonstrate how Trusted Token Propagation Authorization Flow works with AWS IAM Identity Center.
 
 ## Getting started
 1. Review [Configuring Amazon Q Business with AWS IAM Identity Center trusted identity propagation](../docs/tutorials/idc/intro-idc-tti.md)
-2. Create and register application with an OpenID Connect (OIDC) based OAuth 2.0 compliant external identity provider such as Okta, Microsoft Entra ID or Amazon Cognito. More on this below.
-3. Install project libraries using Poetry. See [Project README](../README.md) for more information.
-4. Setup external identity provider of your choice from step 2 above as Trusted Token Issuer in you AWS IAM Identity Center. See [CFN README](../cf/README.md) for how you can use CloudFormation templates to automate the deployment.
-5. Update web application config file as per your project environment. More on this below.
-6. Start web application by executing following command from project home folder: `poetry run python webapp/main.py`
+2. Depending on the choice of your identity provider follow one of the end-to-end tutorials:
+    * _**Okta:**_ [Configuring sample web application with Okta](../docs/tutorials/okta/config-webapp-using-okta.md)
+    * _**Microsoft Entra:**_ [Configuring sample web application with Microsoft Entra](../docs/tutorials/entra/config-webapp-using-entra.md)
 
-## Creating OIDC Web Application in external identity provider
-The callback and logout URLs for this sample application required to register OIDC Web App are as follows. If you plan to run the sample web application from your desktop then use `localhost` for domain name and port 8080.
+## Registering sample web application with OIDC compliant identity provider
+Use the callback and logout URLs below, while registering the sample application with OIDC identity provider (Okta, Microsoft Entra, Amazon Cognito). When run from your workstation, by default, the sample web application will use `localhost` for domain name and `8080` for port.
 * **Callback URL:** `http://<domain_name>:<port>/authorization-code/callback`
-* **Logout URL:** `http://<domain_name>:<port>/logout`
+* **Logout URL (Optional):** `http://<domain_name>:<port>/logout`
 
-### Okta OIDC Web App Setup
-See [Register web application with Okta](../docs/tutorials/okta/register-webapp-with-okta.md) on how to create OIDC application integration in Okta for your web application.
-_Trusted Token Issuer URL for Okta:_ `https://${okta_domain}/oauth2/default`
+### Trusted Token Issuer URI, Audience ID, Client ID and Client Secret
+When you register your web application with OIDC identity provider, the identity provider generates a `Client ID`, `Client Secret` and `Audience ID`. You will need these to identity your application with the identity provider when making requests to obtain ID tokens. For most identity providers, by default, will use `Client ID` for `Audience ID`, if not explicitly stated.
 
-### Amazon Cognito OIDC Web App Setup
-You can use the provided sample CloudFormation template to deploy Amazon Cognito user pool for Proof-of-Concept and testing purposes. For more information see [CFN README](../cf/README.md)
+Identity providers host an authorization server and makes available a `Token Issuer URI` for applications to invoke to authorize users and obtain ID tokens. The default `token issuer URI` for some of the common identity providers and how to find them are listed below:
 
-_Trusted Token Issuer URL for Cognito:_ `https://cognito-idp.<aws_region>.amazonaws.com/<cognito_user_pool_id>`
+#### Trusted token issuer URI by identity provider
+* _**Okta:**_ `https://<okta_domain>/oauth2/default`
+    * For details see [How to find Okta Issuer URI](../docs/tutorials/okta/find-okta-issuer-url.md)
+* _**Microsoft Entra:**_ `https://login.microsoftonline.com/<tenant-id>/v2.0`
+    * For details see [How to find Microsoft Entra Issuer URI](../docs/tutorials/entra/find-entra-issuer-url.md) 
+* _**Amazon Cognito:**_ `https://cognito-idp.<aws_region>.amazonaws.com/<cognito_user_pool_id>`
 
-## Sample Webapp Configuration
-The required parameters for sample Web Application are configured via `.env` stored in `<project_home>/webapp/config/` folder. A template of the env file is available in folder for reference. Rename `.env.okta.dist` or `.env.cognito.dist` to `.env` and update the env file attribute values as needed. A brief description of the attributes are provided below.
+## Configure Web application Configuration
+The required parameters for sample Web Application are configured via `.env` stored in `<project_home>/webapp/config/` folder. A template of the env file is available in folder for reference. Rename `.env.okta.dist`, `.env.entra.dist` or `.env.cognito.dist` to `.env` and update the env file attribute values as needed. A brief description of the attributes are provided below.
 
 ```
 # OAuth client configuration
-# Validate issuer url using '<issuer>/.well-known/openid-configuration'
-issuer_url=https://${okta_domain}/oauth2/default
+# Validate issuer url using '<issuer_url>/.well-known/openid-configuration'
+issuer_url=<Trusted Token Issuer URI>
 client_id=<OIDC client ID>
 client_secret=<OIDC client secret>
 
@@ -44,7 +45,7 @@ region_name=<aws_region_name>
 
 The environment file (`.env`) has two sections: Oauth client and application configuration.
 #### OAuth Client Configuration:
-* **issuer_url:** The _issuer_url_ is the primary URL hosted by OIDC Identity Provider to facilitate discovery, and authorization and identity token generation. Refer to `Creating OIDC Web Application in external identity provider` section for examples of issuer_url for your IdP provider.
+* **issuer_url:** The _issuer_url_ is the primary URL hosted by OIDC Identity Provider to facilitate discovery, and authorization and identity token generation. Refer to `Registering sample web application with OIDC compliant identity provider` section for examples of issuer_url for your IdP provider.
 * **client_id:** The _client_id_ is a public identifier for apps. A unique ID is generated by your IdP when creating n OIDC Web App.
 * **client_secret:** The _client_secret_ is a secret known only to the application and the authorization server. The secret is generated by your IdP when creating n OIDC Web App.
 
@@ -53,4 +54,4 @@ The environment file (`.env`) has two sections: Oauth client and application con
 * **qb_sts_role:** ARN of IAM Role used by STS `AssumeRole` API. This is the output of _CloudFormation template for configuring your application_. For more information see [CFN README](../cf/README.md)
 * **qb_apl_id:** Amazon Q Business application id
 * **app_domain:** Hostname and port of the domain where this sample web application is hosted. If running locally use `localhost:8080`
-* **region_name:** AWS region name where your solution is deployed. Example `us-east-1` or `us-west-2`.
+* **region_name:** AWS region name where your Amazon Q Business application is deployed. Example `us-east-1` or `us-west-2`.
