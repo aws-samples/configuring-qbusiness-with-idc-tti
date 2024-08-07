@@ -1,6 +1,6 @@
 # Sample web application to demonstrate Trusted Token Propagation with AWS IAM Identity Center
 
-You can use this sample web application to see demonstrate how Trusted Token Propagation Authorization Flow works with AWS IAM Identity Center.
+You can use this sample web application to demonstrate how Trusted Token Propagation Authorization Flow works with AWS IAM Identity Center.
 
 ## Getting started
 1. Review [Configuring Amazon Q Business with AWS IAM Identity Center trusted identity propagation](../docs/tutorials/idc/intro-idc-tti.md)
@@ -9,14 +9,14 @@ You can use this sample web application to see demonstrate how Trusted Token Pro
     * _**Microsoft Entra:**_ [Configuring sample web application with Microsoft Entra](../docs/tutorials/entra/config-webapp-using-entra.md)
 
 ## Registering sample web application with OIDC compliant identity provider
-Use the callback and logout URLs below, while registering the sample application with OIDC identity provider (Okta, Microsoft Entra, Amazon Cognito). When run from your workstation, by default, the sample web application will use `localhost` for domain name and `8080` for port.
+Use these callback and logout URLs when registering the sample application with an OIDC compliant identity provider (Okta, Microsoft Entra, or Amazon Cognito). When running from your workstation, the sample web application defaults to using `localhost` as the domain name and `8080` as the port.
 * **Callback URL:** `http://<domain_name>:<port>/authorization-code/callback`
 * **Logout URL (Optional):** `http://<domain_name>:<port>/logout`
 
 ### Trusted Token Issuer URI, Audience ID, Client ID and Client Secret
-When you register your web application with OIDC identity provider, the identity provider generates a `Client ID`, `Client Secret` and `Audience ID`. You will need these to identity your application with the identity provider when making requests to obtain ID tokens. For most identity providers, by default, will use `Client ID` for `Audience ID`, if not explicitly stated.
+When registering your web application with an OIDC compliant identity provider, the provider generates a `Client ID`, `Client Secret` and `Audience ID`. You need these to identify your application to the provider when requesting ID tokens. For most identity providers, the `Client ID` is used as the `Audience ID` by default unless specified otherwise.
 
-Identity providers host an authorization server and makes available a `Token Issuer URI` for applications to invoke to authorize users and obtain ID tokens. The default `token issuer URI` for some of the common identity providers and how to find them are listed below:
+Identity providers host an authorization server and offer a `Token Issuer URI` for applications to authorize users and obtain ID tokens. Below are the default `Token Issuer URI` for some common identity providers and instructions on how to find them.
 
 #### Trusted token issuer URI by identity provider
 * _**Okta:**_ `https://<okta_domain>/oauth2/default`
@@ -25,8 +25,8 @@ Identity providers host an authorization server and makes available a `Token Iss
     * For details see [How to find Microsoft Entra Issuer URI](../docs/tutorials/entra/find-entra-issuer-url.md) 
 * _**Amazon Cognito:**_ `https://cognito-idp.<aws_region>.amazonaws.com/<cognito_user_pool_id>`
 
-## Configure Web application Configuration
-The required parameters for sample Web Application are configured via `.env` stored in `<project_home>/webapp/config/` folder. A template of the env file is available in folder for reference. Rename `.env.okta.dist`, `.env.entra.dist` or `.env.cognito.dist` to `.env` and update the env file attribute values as needed. A brief description of the attributes are provided below.
+## Configure web application environment variables
+The required environment variables for the sample web application are configured via a `.env` file stored in the `<project_home>/webapp/config/` folder. A template of the `.env` file for commonly used identity providers is available in this folder for reference. Rename the template file `.env.<identity_provider>.dist` to `.env` and update the attribute values as needed. For more details on obtaining values for these attributes, see one of the [end-to-end tutorials](../docs/README.md). A brief description of the attributes is provided below.
 
 ```
 # OAuth client configuration
@@ -43,7 +43,7 @@ app_domain=<hostname>:<port>
 region_name=<aws_region_name>
 ```
 
-The environment file (`.env`) has two sections: Oauth client and application configuration.
+The `.env` environment file has two sections: OAuth client and application configuration. The environment values for the OAuth client section are obtained by registering the sample web application with your identity provider. The environment values for the application configuration section are obtained from your Q Business, IAM user, and Identity Center setup in your AWS account.
 #### OAuth Client Configuration:
 * **issuer_url:** The _issuer_url_ is the primary URL hosted by OIDC Identity Provider to facilitate discovery, and authorization and identity token generation. Refer to `Registering sample web application with OIDC compliant identity provider` section for examples of issuer_url for your IdP provider.
 * **client_id:** The _client_id_ is a public identifier for apps. A unique ID is generated by your IdP when creating n OIDC Web App.
