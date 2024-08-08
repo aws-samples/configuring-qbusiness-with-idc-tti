@@ -22,10 +22,12 @@ web application with Okta as external identity provider.
     * **_Auto Sync Users:_** Alternatively, follow [Configure SAML and SCIM with Okta and IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/gs-okta.html) to automatically sync users between Okta and Identity Center.
         * Ensure user email attribute is included in the synced attribute list.
     * From the Identity Center settings, note the `IDC Instance ARN`.
-3. Create Amazon Q Business integrating with Identity Center instance above and use `File Upload` or `S3` connector to index few sample files for query.
-    * Setup user subscription. Ensure the user is same as user created in _step 1_ above.
-    * Try the built-in Amazon Q Business web experience and try asking information from indexed documents.
-    * From the application details page note the `Application ID`
+3. Create Amazon Q Business application.
+    * See [Creating a sample Amazon Q Business application](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/quick-create-app.html) to create new Q Business application.
+    * Ensure the Q Business application is configured to use the Identity Center instance created in _step 2_ above.
+    * From the application details page note the Q Business `Application ID`
+    * Use `File Upload` or `S3` connector to index few sample files for query.
+    * Sign-in to the Amazon Q Business web experience as one of the sample user created in Identity Center and asking information from the sample indexed documents.
 4. Clone this repo and setup the application environment using poetry.
     * Use your local development desktop. Okta must be able to call the sample web applications `Callback URL` running on `localhost:8080` from public network.
     * You will need AWS CLI, Python and Poetry is installed.
