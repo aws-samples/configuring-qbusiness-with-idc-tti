@@ -18,7 +18,7 @@ When registering your web application with an OIDC compliant identity provider, 
 
 Identity providers host an authorization server and offer a `Token Issuer URI` for applications to authorize users and obtain ID tokens. Below are the default `Token Issuer URI` for some common identity providers and instructions on how to find them.
 
-#### Trusted token issuer URI by identity provider
+#### Trusted token issuer URI syntax by identity provider
 * _**Okta:**_ `https://<okta_domain>/oauth2/default`
     * For details see [How to find Okta Issuer URI](../docs/tutorials/okta/find-okta-issuer-url.md)
 * _**Microsoft Entra:**_ `https://login.microsoftonline.com/<tenant-id>/v2.0`

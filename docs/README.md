@@ -7,6 +7,10 @@ Compilation of tutorials and guides to help with using Amazon Q Business identit
 
 ## Tutorials and guides
 
+### Configuring Amazon Q Business with Amazon Cognito
+* End-to-end tutorial: [Configuring sample web application with Amazon Cognito](./tutorials/cognito/config-webapp-using-cognito.md)
+* How-to guide: [Register web application with Amazon Cognito](./tutorials/cognito/register-webapp-with-cognito.md)
+
 ### Configuring Amazon Q Business with Microsoft Entra
 * End-to-end tutorial: [Configuring sample web application with Microsoft Entra](./tutorials/entra/config-webapp-using-entra.md)
 * How-to guide: [Register web application with Microsoft Entra](./tutorials/entra/register-webapp-with-entra.md)
