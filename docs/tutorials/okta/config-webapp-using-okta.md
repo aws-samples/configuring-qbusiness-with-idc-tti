@@ -44,7 +44,7 @@ Use `<project_home>/cf/qb-api-idc-config.yaml` to configure TTI. For the templat
 Note the `IDC Application ARN` output of the stack creation step.
 
 ## 3/ Deploying IAM Roles required by sample web application
-Use `<project_home>/cf/qb-api-idc-config.yaml` to configure IAM Roles and Policies required by web application. For the template parameters:
+Use `<project_home>/cf/qb-api-app-config.yaml` to configure IAM Roles and Policies required by web application. For the template parameters:
 * **QBApplicationID:** Use the Amazon Q Business `Application ID` from _step 3_ in initial setup above.
 * **IDCApiAppArn:** Use the `IDC Application ARN` output by Deploying Trusted token issuer (TTI) CFN.
 * **ClientAppExecutionArn:** Use the AWS `IAM User/Role ARN` from _step 4_ in initial setup above.
