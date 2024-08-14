@@ -1,6 +1,11 @@
 # Amazon Q Business API Tools
 
-This project aims to provide sample [Amazon Q Business](https://console.aws.amazon.com/amazonq/home) API code to help getting started with simple tasks such as list applications, indexes and conversations, and running simple chat commands. The sample also covers using Trusted Token Issuer (TTI) to implement identity-aware SigV4 signed Q Business APIs.
+This project offers sample code for [Amazon Q Business](https://console.aws.amazon.com/amazonq/home) APIs, focusing on:
+* Implementing identity-aware conversation APIs using IAM Identity Center Trusted Token Issuer (TTI)
+* Demonstrating basic tasks such as: Listing applications, Listing indexes, and Listing data sources.
+
+These code samples are designed to help users get started with Amazon Q Business APIs, particularly in scenarios involving identity propagation through TTI. The project aims to provide practical examples for developers looking to integrate Amazon Q Business functionalities into their applications while maintaining proper identity and access management.
+
 
 For more information see AWS Blog [Configure Amazon Q Business with AWS IAM Identity Center trusted identity propagation](https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/)
 
@@ -25,14 +30,14 @@ Remember to follow steps in `Repository Setup` section below to install required
 This code samples is organized into following sections.
 
 ### 1/ CloudFormation Templates for TTI and Cognito
-Sample CloudFormation (CFN) templates are located in `<project_home>/cf` folder. You can use the CFN templates to automate deployment of Trusted Token Issuer (TTI) setup in AWS IAM Identity Center. Also a sample CFN template is provided to create Amazon Cognito user pool, if you do not have an OIDC OAuth 2.0 compliant 3rd party Identity Provider to test TTI deployment.
+Sample CloudFormation (CFN) templates are located in the `<project_home>/cf` folder. These templates automate the deployment of Trusted Token Issuer (TTI) setup in AWS IAM Identity Center. Additionally, a sample CFN template is provided to create an Amazon Cognito user pool if you lack an OIDC OAuth 2.0 compliant third-party Identity Provider for testing TTI deployment.
 
 For more information refer to [CFN README](/cf/README.md).
 
 > Note: You can use CloudFormation Templates without installing the project files.
 
 ### 2/ WebApp for testing TTI and Invoking Q Business Conversation API with identity context
-The sample Flask based web application demonstrates how identity propagation with AWS IAM Identity Center can be implemented and is made available for learning and testing Trust Token Issuer deployment. The web application is located under `<project_home>/webapp`.
+A sample Flask-based web application demonstrating identity propagation with AWS IAM Identity Center is available for learning and testing Trust Token Issuer deployment. This application is located in the `<project_home>/webapp` directory.
 
 For more information refer to [WEBAPP README](/webapp/README.md).
 
@@ -42,7 +47,7 @@ Samples files to demonstrate several use cases to retrieve Q Business applicatio
 For more information refer to [SAMPLES README](/samples/README.md).
 
 ### 4/ Q Business API Helpers
-Various Amazon Q Business API helper methods are located under `<project_home>/src/qbapi_tools` folder. Pydantic based data models makes it easy to de-serialize API responses in JSON. The helper utilities, helps parsing multi-page results and use Python generators for iterating objects improving efficiency of system resource utilization. To get started, review the code samples under `<project_home>/webapp` and `<project_home>/samples` to learn how to use Amazon Q Business API helper utilities for common use cases.
+Amazon Q Business API helper methods are located in the `<project_home>/src/qbapi_tools` folder. Pydantic based data models simplify the deserialization of JSON API responses. Helper utilities parse multi-page results and use Python generators to iterate objects, improving system resource utilization efficiency. To get started, review code samples in the `<project_home>/webapp` and `<project_home>/samples` directories to learn how to use Amazon Q Business API helper utilities for common use cases.
 
 ### 5/ Tutorials and guides
 Compilation of tutorials and guides to help with using Amazon Q Business identity-aware APIs are available under `<project_home>/docs`.
