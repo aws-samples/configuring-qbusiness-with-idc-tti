@@ -23,7 +23,8 @@ from qbapi_tools.datamodel import (
     DocumentDetail, DocumentDetailsResponse,
     ListConversationsResponse, Conversation,
     AIScope, ChatMode, ChatControlConfigResponse,
-    ChatSyncResponse, ChatAttachment
+    ChatSyncResponse, ChatAttachment,
+    CreateDataSourceResponse, StartDataSourceSyncJobResponse
 )
 from qbapi_tools.exception import (
     ChatAIResponseScopeNotFound,
@@ -194,6 +195,51 @@ class QBusinessAPIHelpers:
                 return chat_conf_resp.creatorModeConfiguration.creatorModeControl == "ENABLED"
         logger.warning("Creator mode configuration not found.")
         return False
+
+    def create_custom_ds(self, app_id: str, index_id: str, name: str) -> CreateDataSourceResponse:
+        """Creates custom data source"""
+        ds_create_resp = self._client.create_data_source(
+            applicationId=app_id,
+            indexId=index_id,
+            displayName=name,
+            configuration={"type": DataSourceEnum.custom, "version": "1.0.0"}
+        )
+        return CreateDataSourceResponse(**ds_create_resp)
+
+    def delete_ds(self, app_id: str, index_id: str, ds_id: str) -> None:
+        """Deletes a data source"""
+        self._client.delete_data_source(
+            applicationId=app_id,
+            indexId=index_id,
+            dataSourceId=ds_id
+        )
+
+    def start_ds_sync_job(self, app_id: str, index_id: str, ds_id: str) -> StartDataSourceSyncJobResponse:
+        """Start data source sync job"""
+        ds_start_sync_resp = self._client.start_data_source_sync_job(
+            applicationId=app_id,
+            indexId=index_id,
+            dataSourceId=ds_id
+        )
+        return StartDataSourceSyncJobResponse(**ds_start_sync_resp)
+
+    def stop_ds_sync_job(self, app_id: str, index_id: str, ds_id: str) -> None:
+        """Stop data source sync job"""
+        self._client.stop_data_source_sync_job(
+            applicationId=app_id,
+            indexId=index_id,
+            dataSourceId=ds_id
+        )
+
+    def put_documents(self, app_id: str, index_id: str, ds_id: str, sync_id: str, documents: dict):
+        """Puts documents to custom data source"""
+        put_docs_resp = self._client.batch_put_document(
+            applicationId=app_id,
+            indexId=index_id,
+            dataSourceSyncId=sync_id,
+            documents=documents
+        )
+        return put_docs_resp
 
     def list_conversations(self, app_id: str,
                            user_id: Optional[str] = None) -> Iterator[Conversation]:

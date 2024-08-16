@@ -231,18 +231,19 @@ def main():
     # * - Update Q Business application id and email for user id *
     # ************************************************************
 
-    user_id = "tester@anycompany.com"
-    app_id = "<qbusiness-application-id>"
+    user_id = "tester1@anycompany.com"
+    app_id = "0d9b62e4-a0d6-4782-9fa1-e27724e7f491"
 
-    print_conversation_list(app_id, user_id)
+    # print_conversation_list(app_id, user_id)
 
-    simple_qna(app_id, user_id)
+    # simple_qna(app_id, user_id)
+    simple_qna(app_id, user_id, "Why use trusted identity propagation?")
     # simple_conversation(app_id, user_id)
     # chat_with_file(app_id, user_id)
     # chat_with_ai_fallback_on_off(app_id, user_id)
 
     # delete_conversation_by_age(app_id, user_id)
-    # delete_all_conversation(app_id, user_id)
+    delete_all_conversation(app_id, user_id)
 
 
 if __name__ == "__main__":

@@ -62,6 +62,17 @@ class Application(BaseModel):
     status: str
 
 
+class CreateDataSourceResponse(BaseModel):
+    """Create data source response object"""
+    dataSourceId: str
+    dataSourceArn: str
+
+
+class StartDataSourceSyncJobResponse(BaseModel):
+    """Start data source sync job response object"""
+    executionId: str
+
+
 class ListApplicationsResponse(BaseModel):
     """List applications response object"""
     nextToken: Optional[str] = None
