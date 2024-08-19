@@ -22,11 +22,18 @@ Each method in the sample code represents a typical API usage use case. They are
 * Have a private chat conversation with your file
 * Enable/disable AI knowledge/enterprise data only mode using API with citations
 
+## Custom Data Source (custom_ds.py)
+* Create a custom data source
+* Delete data source
+* Use `BatchPutDocument` to sync data with custom data source with/without ACL (Access Control List)
+
 ### Executing the sample files
-Ensure you have completed project installation steps listed in [Project README](../README.md).
-Update  `app_id`, `region_name`, `user_id` in `main` method as needed. From the project home folder, execute the following commands to run the code.
+1. Ensure you have completed project installation steps listed in [Project README](../README.md).
+2. Rename `<project_home>/samples/.env.dist` file to `<project_home>/samples/.env`
+3. Update `.env` file values for region name, Q Business `app_id`, `index_id`, `custom_ds_id`.
 
 ```
 poetry run python samples/info.py
 poetry run python samples/chat.py
+poetry run python samples/custom_ds.py
 ```

@@ -73,6 +73,18 @@ class StartDataSourceSyncJobResponse(BaseModel):
     executionId: str
 
 
+class UserAlias(BaseModel):
+    """User alias object for a data source"""
+    indexId: Optional[str] = None
+    dataSourceId: Optional[str] = None
+    userId: str
+
+
+class GetUserResponse(BaseModel):
+    """Get user response object"""
+    userAliases: list[UserAlias] = Field(default_factory=list)
+
+
 class ListApplicationsResponse(BaseModel):
     """List applications response object"""
     nextToken: Optional[str] = None

@@ -9,8 +9,10 @@ import os
 import logging
 import time
 from datetime import timedelta
+from pathlib import Path
 from typing import List, Optional
 
+from dotenv import dotenv_values
 from rich.logging import RichHandler
 from rich.pretty import pretty_repr
 from qbapi_tools.api_helpers import QBusinessAPIHelpers
@@ -23,9 +25,17 @@ logger.addHandler(RichHandler(
     show_time=False, show_path=False, show_level=False, rich_tracebacks=False
 ))
 logger.setLevel(logging.getLevelName(os.environ.get('logging', 'DEBUG')))
+
+config = {
+    **dotenv_values(dotenv_path=Path('./samples/.env').absolute())
+}
+
 WAIT_SECS_TO_SIMULATE_AGE = 10
 WAIT_SECS_FOR_SETTING_UPDATE = 5
-REGION_NAME = 'us-east-1'
+REGION_NAME = config.get(
+    "region_name",
+    os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
+)
 
 
 def _citations(attributions: List[SourceAttribution]) -> List[str]:
@@ -228,22 +238,22 @@ def main():
     # * Following use cases uses generic questions:              *
     # * TURN-ON admin setting to fallback to LLM world knowledge *
     # * - Uncomment USE CASES as needed                          *
-    # * - Update Q Business application id and email for user id *
+    # * - Update env file for Q Business region name and app id  *
     # ************************************************************
 
-    user_id = "tester1@anycompany.com"
-    app_id = "0d9b62e4-a0d6-4782-9fa1-e27724e7f491"
+    app_id = config.get("app_id")
+    user_id = config.get("user_id", "tester@anycompany.com")
 
-    # print_conversation_list(app_id, user_id)
+    if app_id and user_id:
+        print_conversation_list(app_id, user_id)
 
-    # simple_qna(app_id, user_id)
-    simple_qna(app_id, user_id, "Why use trusted identity propagation?")
-    # simple_conversation(app_id, user_id)
-    # chat_with_file(app_id, user_id)
-    # chat_with_ai_fallback_on_off(app_id, user_id)
+        # simple_qna(app_id, user_id)
+        # simple_conversation(app_id, user_id)
+        # chat_with_file(app_id, user_id)
+        # chat_with_ai_fallback_on_off(app_id, user_id)
 
-    # delete_conversation_by_age(app_id, user_id)
-    delete_all_conversation(app_id, user_id)
+        # delete_conversation_by_age(app_id, user_id)
+        # delete_all_conversation(app_id, user_id)
 
 
 if __name__ == "__main__":

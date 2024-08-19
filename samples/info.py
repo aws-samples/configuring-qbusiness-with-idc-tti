@@ -7,7 +7,9 @@
 
 import os
 import logging
+from pathlib import Path
 
+from dotenv import dotenv_values
 from rich.logging import RichHandler
 from rich.pretty import pretty_repr
 from qbapi_tools.api_helpers import QBusinessAPIHelpers
@@ -20,6 +22,10 @@ logger.addHandler(RichHandler(
     show_time=False, show_path=False, show_level=False, rich_tracebacks=False
 ))
 logger.setLevel(logging.getLevelName(os.environ.get('logging', 'DEBUG')))
+
+config = {
+    **dotenv_values(dotenv_path=Path('./samples/.env').absolute())
+}
 
 
 def print_apps_info(region_name: str):
@@ -157,27 +163,31 @@ def print_indexed_docs_4_app_ds_type(app_id: str, ds_type: DataSourceEnum):
 def main():
     """Demos Q Business API helper usage."""
 
-    # *******************************************************
-    # * Uncomment USE CASES as needed                       *
-    # * Update Q Business region name and application id    *
-    # *******************************************************
-    region_name = "us-east-1"
-    # app_id = "<qbusiness-application-id>"
+    # **********************************************************
+    # * Uncomment USE CASES as needed                          *
+    # * Update env file for Q Business region name and app id  *
+    # **********************************************************
+    region_name = config.get(
+        "region_name",
+        os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
+    )
+    app_id = config.get("app_id")
 
     print_apps_info(region_name)
     # print_apps_info_as_list(region_name)
 
-    # print_index_ids_as_list_4_app(app_id)
-    # print_all_ds_info_4_app(app_id)
+    if app_id:
+        print_index_ids_as_list_4_app(app_id)
+        # print_all_ds_info_4_app(app_id)
 
-    # print_ds_id_list_by_ds_type_4_app(app_id, DataSourceEnum.s3)
-    # print_ds_id_list_by_ds_type_4_app(app_id, DataSourceEnum.confluence)
-    # print_ds_id_list_by_ds_type_4_app(app_id, DataSourceEnum.sharepoint)
+        # print_ds_id_list_by_ds_type_4_app(app_id, DataSourceEnum.s3)
+        # print_ds_id_list_by_ds_type_4_app(app_id, DataSourceEnum.confluence)
+        # print_ds_id_list_by_ds_type_4_app(app_id, DataSourceEnum.sharepoint)
 
-    # print_all_indexed_docs_4_app(app_id)
-    # print_indexed_docs_4_app_ds_type(app_id, DataSourceEnum.s3)
-    # print_indexed_docs_4_app_ds_type(app_id, DataSourceEnum.confluence)
-    # print_indexed_docs_4_app_ds_type(app_id, DataSourceEnum.sharepoint)
+        # print_all_indexed_docs_4_app(app_id)
+        # print_indexed_docs_4_app_ds_type(app_id, DataSourceEnum.s3)
+        # print_indexed_docs_4_app_ds_type(app_id, DataSourceEnum.confluence)
+        # print_indexed_docs_4_app_ds_type(app_id, DataSourceEnum.sharepoint)
 
 
 if __name__ == "__main__":

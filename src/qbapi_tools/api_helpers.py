@@ -1,7 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-# pylint: disable=invalid-name,not-an-iterable,too-many-arguments
+# pylint: disable=invalid-name,not-an-iterable,too-many-arguments.logging-fstring-interpolation
 
 """Amazon Q Business Expert API helpers to parse responses and paginate"""
 
@@ -24,7 +24,8 @@ from qbapi_tools.datamodel import (
     ListConversationsResponse, Conversation,
     AIScope, ChatMode, ChatControlConfigResponse,
     ChatSyncResponse, ChatAttachment,
-    CreateDataSourceResponse, StartDataSourceSyncJobResponse
+    CreateDataSourceResponse, StartDataSourceSyncJobResponse,
+    GetUserResponse
 )
 from qbapi_tools.exception import (
     ChatAIResponseScopeNotFound,
@@ -231,7 +232,7 @@ class QBusinessAPIHelpers:
             dataSourceId=ds_id
         )
 
-    def put_documents(self, app_id: str, index_id: str, ds_id: str, sync_id: str, documents: dict):
+    def put_documents(self, app_id: str, index_id: str, sync_id: str, documents: dict):
         """Puts documents to custom data source"""
         put_docs_resp = self._client.batch_put_document(
             applicationId=app_id,
@@ -240,6 +241,65 @@ class QBusinessAPIHelpers:
             documents=documents
         )
         return put_docs_resp
+
+    def add_user_alias(
+            self, email: str, alias: str, app_id: str,
+            index_id: str, ds_id: str) -> dict:
+        """Creates user and/or update user alias"""
+        get_user_resp = None
+        alias_list = []
+        try:
+            get_user_resp = GetUserResponse(**self._client.get_user(
+                applicationId=app_id,
+                userId=email
+            ))
+            logger.debug(get_user_resp)
+        except self._client.exceptions.ResourceNotFoundException:
+            logger.warning(f"User '{email}' not found. Will create.")
+
+        if get_user_resp:
+            # Check if alias exists and skip
+            alias_list = list(filter(
+                lambda x: (x.indexId == index_id
+                           and x.dataSourceId == ds_id
+                           and x.userId == alias),
+                get_user_resp.userAliases
+            ))
+        else:
+            # Create user/alias
+            logger.info(f"Creating user '{email}' / alias '{alias}'")
+            resp = self._client.create_user(
+                applicationId=app_id,
+                userId=email,
+                userAliases=[
+                    {
+                        'indexId': index_id,
+                        'dataSourceId': ds_id,
+                        'userId': alias
+                    },
+                ],
+                clientToken=self._get_client_token()
+            )
+            return resp
+
+        if len(alias_list) <= 0:
+            # Update user/alias
+            logger.info(f"Updating user '{email}' / alias '{alias}'")
+            resp = self._client.update_user(
+                applicationId=app_id,
+                userId=email,
+                userAliasesToUpdate=[
+                    {
+                        'indexId': index_id,
+                        'dataSourceId': ds_id,
+                        'userId': alias
+                    },
+                ]
+            )
+            return resp
+
+        # No action: user and alias exist
+        return {}
 
     def list_conversations(self, app_id: str,
                            user_id: Optional[str] = None) -> Iterator[Conversation]:

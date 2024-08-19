@@ -7,6 +7,7 @@
 
 import os
 import logging
+import hashlib
 from pathlib import Path
 
 from dotenv import dotenv_values
@@ -14,7 +15,7 @@ from rich.logging import RichHandler
 from rich.pretty import pretty_repr
 from qbapi_tools.api_helpers import QBusinessAPIHelpers
 from qbapi_tools.datamodel import (
-    ServiceConfig,
+    ServiceConfig, CreateDataSourceResponse
 )
 
 logger = logging.getLogger("qbapi_samples")
@@ -24,8 +25,7 @@ logger.addHandler(RichHandler(
 logger.setLevel(logging.getLevelName(os.environ.get('logging', 'DEBUG')))
 
 config = {
-    **dotenv_values(dotenv_path=Path('./samples/.env').absolute()),
-    **os.environ  # override loaded values with system env variables
+    **dotenv_values(dotenv_path=Path('./samples/.env').absolute())
 }
 
 DATA_BLOB = """
@@ -39,9 +39,14 @@ Some of the benefits of using trusted identity propagation are:
 * Facilitates auditability and fosters responsible use of resources as Q Business automatically logs API invocations to AWS CloudTrail along with user identifier.
 * Promotes software design principles rooted in user privacy.
 """
+DATA_BLOB_SRC = "https://aws.amazon.com/blogs/machine-learning/configuring-amazon-q-business-with-aws-iam-identity-center-trusted-identity-propagation/"
 
 
-def create_custom_ds(app_id: str, index_id: str, region_name: str, name: str):
+def create_custom_ds(
+        app_id: str,
+        index_id: str,
+        region_name: str,
+        name: str) -> CreateDataSourceResponse:
     """Create a custom data source"""
     logger.info(
         "\n[bold][u]Use Case: Create a custom data source[/]",
@@ -82,42 +87,54 @@ def delete_custom_ds(app_id: str, index_id: str, custom_ds_id: str, region_name:
     )
 
 
-def custom_ds_sync_data(app_id: str, index_id: str, custom_ds_id: str, region_name: str):
+def custom_ds_sync_data(
+        app_id: str, index_id: str, custom_ds_id: str,
+        user_id: str, acl_on: bool, region_name: str):
     """sync data with custom data source"""
     logger.info(
-        "\n[bold][u]Use Case: Create a custom data source[/]",
+        "\n[bold][u]Use Case: Sync data with custom data source[/]",
         extra={"markup": True}
     )
     logger.debug(f"Region Name: {region_name}")
     logger.debug(f"Application ID: {app_id}")
     logger.debug(f"Index ID: {index_id}")
     logger.debug(f"Custom Data Source ID: {custom_ds_id}")
+    logger.debug(f"ACL On: {acl_on}")
+    logger.debug(f"User Id: {user_id}")
     q_api_helper = QBusinessAPIHelpers(
         service_config=ServiceConfig(region_name=region_name)
     )
+
+    # When using ACL, First add user alias to Q Business User Store
+    if acl_on:
+        add_user_resp = q_api_helper.add_user_alias(
+            user_id, user_id, app_id, 
+            index_id, custom_ds_id
+        )
+        logger.debug(f"Add user to store:\n{add_user_resp}")
+
+    # Start sync and add document with ACL
     sync_start_resp = q_api_helper.start_ds_sync_job(app_id, index_id, custom_ds_id)
-    logger.debug(sync_start_resp)
+    logger.debug(f"Sync job start:\n{sync_start_resp}")
     try:
         document = {
-            "id": "demo-data-1",
-            "attributes": [{"name": "_source_uri", "value": {"stringValue": "demo-custom-ds"}}],
+            "id": hashlib.shake_256(DATA_BLOB_SRC.encode('utf-8')).hexdigest(128),
+            "attributes": [{
+                "name": "_source_uri",
+                "value": {"stringValue": DATA_BLOB_SRC}
+            }],
             "content": {"blob": DATA_BLOB.encode('utf-8')},
             "contentType": "PLAIN_TEXT",
-            "title": "Why use trusted identity propagation?",
-            'accessConfiguration': {
+            "title": "Why use trusted identity propagation?"
+        }
+        if acl_on:
+            document["accessConfiguration"] = {
                 'accessControls': [
                     {
                         'principals': [
                             {
                                 'user': {
-                                    'id': 'tester@anycompany.com',
-                                    'access': 'ALLOW',
-                                    'membershipType': 'DATASOURCE'
-                                }
-                            },
-                            {
-                                'user': {
-                                    'id': 'tester1@anycompany.com',
+                                    'id': user_id,
                                     'access': 'ALLOW',
                                     'membershipType': 'DATASOURCE'
                                 }
@@ -126,13 +143,12 @@ def custom_ds_sync_data(app_id: str, index_id: str, custom_ds_id: str, region_na
                     },
                 ]
             }
-        }
         resp = q_api_helper.put_documents(
-            app_id, index_id, custom_ds_id,
+            app_id, index_id,
             sync_start_resp.executionId,
             [document]
         )
-        logger.debug(pretty_repr(resp))
+        logger.debug(f"Put document: {pretty_repr(resp)}")
     except Exception as ex:
         logger.exception(ex)
     q_api_helper.stop_ds_sync_job(app_id, index_id, custom_ds_id)
@@ -140,39 +156,46 @@ def custom_ds_sync_data(app_id: str, index_id: str, custom_ds_id: str, region_na
 
 def main():
     """Demonstrate custom data source"""
+
+    # **********************************************************
+    # * Update env file for                                    *
+    # * - AWS Region name                                      *
+    # * - Q Business app id                                    *
+    # * - Q Business index id                                  *
+    # * - Q Business custom data source id                     *
+    # * - Create/delete custom data source flag                *
+    # **********************************************************
+
     region_name = config.get(
         "region_name",
-        config.get('AWS_DEFAULT_REGION', 'us-east-1')
+        os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
     )
+    acl_on = config.get("acl_on", "false").lower() == "true"
+    create_ds = config.get("create_custom_ds", "false").lower() == "true"
+    delete_ds = config.get("delete_custom_ds", "false").lower() == "true"
+    user_id = config.get("user_id", "tester@anycompany.com")
 
-    app_id = config.get("app_id", None)
+    app_id = config.get("app_id")
     if not app_id:
         raise ValueError("Missing Q Business application app_id.")
-
-    index_id = config.get("index_id", None)
+    index_id = config.get("index_id")
     if not index_id:
         raise ValueError("Missing index_id.")
 
-    create_ds = config.get("create_custom_ds", "false").lower() == "true"
-    delete_ds = config.get("delete_custom_ds", "false").lower() == "true"
-    custom_ds_id = config.get("custom_ds_id", None)
-
-    if not custom_ds_id and create_ds:
+    custom_ds_id = config.get("custom_ds_id")
+    if create_ds:
         # Create new custom data source
         resp = create_custom_ds(app_id, index_id, region_name, "demo-custom-ds")
-        logger.debug(resp)
+        logger.debug("Create data source:\n{resp}")
         custom_ds_id = resp.dataSourceId
-
-    if not custom_ds_id:
-        raise ValueError("Missing custom_ds_id.")
-
-    if delete_ds:
+    elif delete_ds:
         # Delete custom data source
         delete_custom_ds(app_id, index_id, custom_ds_id, region_name)
-    else:
+    elif custom_ds_id:
         # sync data
-        custom_ds_sync_data(app_id, index_id, custom_ds_id, region_name)
-
+        custom_ds_sync_data(app_id, index_id, custom_ds_id, user_id, acl_on, region_name)
+    else:
+        raise ValueError("Missing custom_ds_id.")
 
 if __name__ == "__main__":
     main()
