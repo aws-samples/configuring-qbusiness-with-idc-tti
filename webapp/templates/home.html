@@ -6,21 +6,22 @@
 {% if current_user.is_authenticated %}
 <div>
     <p>Welcome back, <span>{{ current_user.name }}</span>!</p>
-    <p>You have successfully authenticated with identity provider, and have been redirected back to this application.</p>
-    <p>Visit the <a href="{{ url_for('profile') }}">My Profile</a> page in this application to view the information
-        retrieved with your OAuth Access Token.</p>
-    <p>Visit the <a href="{{ url_for('conversations') }}">My Conversations</a> page in this application to view a 
-        list of active conversations retrieved using Amazon Q Business API.</p>
+    <p>You've successfully authenticated with your Identity Provider and returned to this application.</p>
+    <p>Visit the <a href="{{ url_for('chat') }}">My Chat</a> page to chat with Q Business AI assistant.</p>
+    <p>Visit the <a href="{{ url_for('conversations') }}">My Conversations</a> page to view active conversations retrieved via the Q Business API.</p>
+    <p>Visit the <a href="{{ url_for('profile') }}">My Profile</a> page to view your information from identity provider's ID token.</p>
 </div>
 {% else %}
 
 
 <div>
     <p>Hello!</p>
-    <p>This sample uses Amazon Q Business API authorization code flow in a Flask application.</p>
-    <p>When you click the login button below, you will be redirected to the login page on your Identity Provider. 
-        After you authenticate, you will be returned to this application and your authorization code will be used
-        to securely generate credentials to access Q Business API.
+    <p>This sample web application demonstrates how the identity-aware 
+        Amazon Q Business API can be used to create custom web experiences.</p>
+    <p>When you click the login button below, you'll be redirected to your 
+        Identity Provider's login page. After authentication, you'll return to 
+        this application. Your authorization code will then securely generate 
+        credentials for accessing the identity-aware Q Business API.
     </p>
 </div>
 

@@ -1,0 +1,160 @@
+{% extends "template.html" %}
+{% block title %}My Chat{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<style>
+    #chat-messages {
+        height: 70vh;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    #user-input {
+        width: 84%;
+    }
+    #answer-btn {
+        width: 13%;
+    }
+    .icon {
+        margin-right: 10px;
+    }
+    .message {
+        padding: 15px;
+    }
+    .message-border {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #bfb7b7;
+        border-radius: 10px;
+    }
+    #answer-container {
+        align-items: center;
+        align-content: center;
+    }
+</style>
+<div>
+    <h2>My Chat</h2>
+    <p>Hello, <span>{{ user.name }}</span>. Chat with the Amazon Q Business AI assistant below.
+    </p>
+</div>
+<hr>
+<div id="chat-messages">
+    <div id="chat-messages-wrapper" class="wrapper">
+        <!-- Chat messages will be added here -->
+    </div>
+</div>
+<hr>
+<div id="answer-container"></div>
+    <input type="text" id="user-input" placeholder="Ask Q Business a question">
+    <button onclick="getAnswer()" id="answer-btn">Get Answer</button>
+    <input type="hidden" id="conversation-id" name="conversation-id" value="" />
+    <input type="hidden" id="sys-msg-id" name="sys-msg-id" value="" />
+</div>
+
+<script>
+    function enableUserInputs(enable) {
+        if (enable) {
+            document.getElementById("user-input").value = "";
+            document.getElementById("user-input").disabled = false;
+            document.getElementById("answer-btn").disabled = false;
+        } else {
+            message = "Retrieving answer from Q Business...";
+            document.getElementById("user-input").value = message;
+            document.getElementById("user-input").disabled = true;
+            document.getElementById("answer-btn").disabled = true;
+        }
+    }
+
+    function addMessage(isAI, message, sourceAttributions) {
+        var messageContainer = document.createElement("div");
+        html = "<p>";
+        if (isAI) {
+            messageContainer.className = "message message-border";
+            html += "<span class='material-symbols-outlined icon'>computer</span>";
+        } else {
+            messageContainer.className = "message";
+            html += "<span class='material-symbols-outlined icon'>person</span>";
+        }
+        html += message;
+        if (Array.isArray(sourceAttributions) && sourceAttributions.length>0) {
+            html += "<hr>";
+            sourceAttributions.forEach((element, index) => {
+                title = "No title"
+                url = ""
+                if(element.hasOwnProperty("title")) title = element.title;
+                if(element.hasOwnProperty("url")) url = element.url;
+                html += "<span>" + (index + 1) + ". "
+                if(url) {
+                    html += '<a target="_blank" '
+                    html += 'href="' + url + '"'
+                    html += '>' + title + '</a>'
+                } else {
+                    html += title
+                }
+                html += "</span><br/>"
+            });
+        }
+        html += "</p>";
+        messageContainer.innerHTML = html;
+        var chatMessages = document.getElementById("chat-messages-wrapper");
+        chatMessages.appendChild(messageContainer);
+    }
+
+    function getAnswer() {
+        userInput = document.getElementById("user-input").value;
+        var req_data = {
+            question: document.getElementById("user-input").value,
+            conversationId: document.getElementById("conversation-id").value,
+            prevSysMessageId: document.getElementById("sys-msg-id").value
+        }
+        addMessage(false, userInput);
+        enableUserInputs(false);
+        fetch("/answer", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            signal: AbortSignal.timeout(60000),
+            body: JSON.stringify(req_data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            message = data.systemMessage.replaceAll('\n', '<br/>');
+            sourceAttributions = ""
+            if (data.hasOwnProperty('sourceAttributions') && Array.isArray(data.sourceAttributions)) {
+                sourceAttributions = data.sourceAttributions.filter((obj) => {
+                    return obj.hasOwnProperty("citationNumber") && obj.citationNumber > 0
+                });
+            }
+            if (data.hasOwnProperty('conversationId') && data.conversationId) {
+                document.getElementById("conversation-id").value = data.conversationId;
+            }
+            if (data.hasOwnProperty('systemMessageId') && data.systemMessageId) {
+                document.getElementById("sys-msg-id").value = data.systemMessageId;
+            }
+            addMessage(true, message, sourceAttributions);
+            enableUserInputs(true);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            addMessage(true, "Sorry, an error occurred while getting the answer.");
+            enableUserInputs(true);
+        });
+
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        addMessage(
+            true,
+            ("I’m Amazon Q Business, your AI assistant." +
+            " Ask me anything to start a conversation." +
+            " I’ll give you answers using information from your company." +
+            " Let’s get started!")
+        );
+    }, false);
+</script>
+
+{% endblock content %}

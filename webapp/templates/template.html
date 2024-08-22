@@ -10,8 +10,8 @@
     <![endif]-->
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
-
-    <title>Amazon Q Business API Authorization Demo</title>
+    
+    <title>{% block title %}Home{% endblock %} - Amazon Q Business API Demo</title>
 </head>
 <body id="samples">
 <nav class="navbar navbar-default">
@@ -19,6 +19,7 @@
         <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
             {% if current_user.is_authenticated %}
+            <li><a id="chat-button" href="{{ url_for("chat") }}">My Chat</a></li>
             <li><a id="conversation-button" href="{{ url_for("conversations") }}">My Conversations</a></li>
             <li><a id="profile-button" href="{{ url_for("profile") }}">My Profile</a></li>
             {% endif %}

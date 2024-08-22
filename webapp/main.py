@@ -19,6 +19,7 @@ import os
 import random
 import string
 import logging
+import json
 from pathlib import Path
 
 import requests
@@ -45,7 +46,7 @@ from qbapi_tools.exception import (
     AccessHelperException,
 )
 from qbapi_tools.datamodel import (
-    ServiceConfig,
+    ServiceConfig, ChatMode
 )
 
 logger = logging.getLogger("qbapi_demo")
@@ -124,7 +125,6 @@ def callback():
     code = request.args.get("code")
     if not code:
         return "The authorization code was not returned or is not accessible", 403
-
     try:
         # ------------------------------------------------
         # | STEP (2): Get OIDC identity token            |
@@ -136,7 +136,6 @@ def callback():
             client_id=config["client_id"],
             client_secret=config["client_secret"]
         )
-
         # ------------------------------------------------
         # | STEP (3): Get IDC STS context token          |
         # ------------------------------------------------
@@ -145,7 +144,6 @@ def callback():
             odic_data.id_token,
             region_name
         )
-
         # ------------------------------------------------
         # | STEP (4): Get STS temporary credential       |
         # ------------------------------------------------
@@ -153,7 +151,6 @@ def callback():
             config["qb_sts_role"], idc_sts_context,
             region_name
         )
-
         # Authorization flow successful
         # Cache user info and credentials in user store
         user = User.get(odic_data.jwt_sub)
@@ -165,7 +162,7 @@ def callback():
                 credential=credential
             )
         login_user(user)
-        return redirect(url_for("conversations"))
+        return redirect(url_for("chat"))
     except AccessHelperException as ex:
         logger.exception(ex.args[0])
         return ex.args[0], 403
@@ -174,12 +171,55 @@ def callback():
         return "Internal error", 500
 
 
+@app.route("/chat", methods=['GET', 'POST'])
+@login_required
+def chat():
+    """Generate chat page"""
+    return render_template(
+        "chat.html",
+        user=current_user
+    )
+
+
+@app.route('/answer', methods=['POST'])
+@login_required
+def get_answer():
+    """Invoke Q Business Chat API to get answer"""
+    answer = "Sorry, an error occurred while getting the answer."
+    try:
+        data = json.loads(request.data)
+        if "question" not in data:
+            logger.error("Missing user query.")
+            return json.dumps({'systemMessage': answer})
+        # ----------------------------------------------------------
+        # | STEP (5): Use temp credentials to call Q Business APIs |
+        # ----------------------------------------------------------
+        q_api_helper = QBusinessAPIHelpers(
+            service_config=ServiceConfig(region_name=region_name),
+            credentials=current_user.credential,
+        )
+        chat_params = {
+            "message": data['question'],
+            "app_id": config["qb_apl_id"],
+            "chat_mode": ChatMode.retrieval
+        }
+        if "conversationId" in data and "prevSysMessageId" in data:
+            chat_params["conversation_id"] = data["conversationId"]
+            chat_params["prev_sys_message_id"] = data["prevSysMessageId"]
+        resp = q_api_helper.chat_sync_ttp(**chat_params).model_dump()
+        logger.debug(resp)
+        return json.dumps(resp)
+    except Exception as ex:
+        logger.error(ex)
+    return json.dumps({'systemMessage': answer})
+
+
 @app.route("/conversations")
 @login_required
 def conversations():
     """Generate conversations page"""
     # ----------------------------------------------------------
-    # | STEP (5): Use credentials to call Q Business User APIs |
+    # | STEP (5): Use temp credentials to call Q Business APIs |
     # ----------------------------------------------------------
     q_api_helper = QBusinessAPIHelpers(
         service_config=ServiceConfig(region_name=region_name),

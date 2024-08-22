@@ -4,6 +4,8 @@ This project offers sample code for [Amazon Q Business](https://console.aws.amaz
 * Implementing identity-aware conversation APIs using IAM Identity Center Trusted Token Issuer (TTI)
 * Demonstrating basic tasks such as: Listing applications, Listing indexes, and Listing data sources.
 
+![my-chat](/docs/images/my-chat.png)
+
 These code samples are designed to help users get started with Amazon Q Business APIs, particularly in scenarios involving identity propagation through TTI. The project aims to provide practical examples for developers looking to integrate Amazon Q Business functionalities into their applications while maintaining proper identity and access management.
 
 

@@ -176,10 +176,10 @@ class TextMessageSegment(BaseModel):
 
 class SourceAttribution(BaseModel):
     """Chat Sync source attribution"""
-    citationNumber: int
-    snippet: str
+    citationNumber: Optional[int] = None
+    snippet: Optional[str] = None
     title: str
-    url: str
+    url: Optional[str] = None
     textMessageSegments: List[TextMessageSegment] = Field(default_factory=list)
     updatedAt: Optional[datetime] = None
 
