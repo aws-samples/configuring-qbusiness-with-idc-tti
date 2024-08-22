@@ -171,7 +171,7 @@ def callback():
         return "Internal error", 500
 
 
-@app.route("/chat", methods=['GET', 'POST'])
+@app.route("/chat", methods=['GET'])
 @login_required
 def chat():
     """Generate chat page"""
@@ -214,7 +214,7 @@ def get_answer():
     return json.dumps({'systemMessage': answer})
 
 
-@app.route("/conversations")
+@app.route("/conversations", methods=['GET'])
 @login_required
 def conversations():
     """Generate conversations page"""
@@ -234,7 +234,35 @@ def conversations():
     )
 
 
-@app.route("/profile")
+@app.route("/delete_chat", methods=['POST'])
+@login_required
+def delete_conversation():
+    """Delete conversation"""
+    status = "fail"
+    # ----------------------------------------------------------
+    # | STEP (5): Use temp credentials to call Q Business APIs |
+    # ----------------------------------------------------------
+    try:
+        data = json.loads(request.data)
+        if "conversationId" not in data or not data.get("conversationId"):
+            logger.error("Missing conversation ID.")
+            return json.dumps({'status': status})
+        q_api_helper = QBusinessAPIHelpers(
+            service_config=ServiceConfig(region_name=region_name),
+            credentials=current_user.credential
+        )
+        resp = q_api_helper.delete_conversation(
+            conversation_id=data["conversationId"],
+            app_id=config["qb_apl_id"]
+        )
+        logger.debug(resp)
+        status = "success"
+    except Exception as ex:
+        logger.error(ex)
+    return json.dumps({'status': status})
+
+
+@app.route("/profile", methods=['GET'])
 @login_required
 def profile():
     """Generate profile page"""

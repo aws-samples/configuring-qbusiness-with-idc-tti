@@ -17,13 +17,44 @@
     </thead>
     <tbody>
     {% for conversation in conversations %}
-    <tr>
+    <tr id='{{ conversation.conversationId }}'>
         <td>{{ conversation.conversationId }}</td>
         <td id="claim-{{ conversation.conversationId }}">
             {{ conversation.title }}
         </td>
+        <td><button onclick="deleteConversation('{{ conversation.conversationId }}')" id="answer-btn">Delete</button></td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
+
+<script>
+    function deleteTableRow(rowId)  
+    {   
+        var row = document.getElementById(rowId);
+        row.parentNode.removeChild(row);
+    }
+
+    function deleteConversation(id) {
+        console.log("conversationId = " + id);
+        fetch("/delete_chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            signal: AbortSignal.timeout(60000),
+            body: JSON.stringify({conversationId: id})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data && data.hasOwnProperty('status') && data.status.toLowerCase() == "success") {
+                deleteTableRow(id);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+</script>
 {% endblock content %}
