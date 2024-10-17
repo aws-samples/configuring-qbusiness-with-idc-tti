@@ -2,8 +2,65 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Create AWS Cognito User Pool for Amazon Q Business proof-of-concept
 
 Resources:
+  PreTokenGenLambdaExecRole:
+    Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: Role for Cognito Pre-token generation Lambda
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  
+  PreTokenGenLambda:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - PreTokenGenLambdaExecRole
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W92
+            reason: Lambda used by CFN Stack Creation for managing custom resources
+          - id: W89
+            reason: Lambda used by CFN Stack Creation for managing custom resources. VPC not required
+    Properties:
+      Handler: index.handler
+      Runtime: python3.11
+      Timeout: 300
+      Description: Create IDC Local Instance
+      Role: !GetAtt PreTokenGenLambdaExecRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          def handler(event, context):
+              event["response"] = {
+                  "claimsAndScopeOverrideDetails": {
+                      "idTokenGeneration": {
+                          "claimsToAddOrOverride": {
+                              "principal_tags": {
+                                  "Email": [event['request']['userAttributes']['email']]
+                              }
+                          },
+                      },
+                      "accessTokenGeneration": {}
+                  }
+              }
+              return event
+
   UserPool:
     Type: AWS::Cognito::UserPool
+    DependsOn:
+      - PreTokenGenLambda
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -11,6 +68,12 @@ Resources:
             reason: CFN intended for proof-of-concept. SMS may not be available for MFA yet.
     Properties:
       UserPoolName: !Sub ${AWS::StackName}-user-pool
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
+      LambdaConfig:
+        PreTokenGenerationConfig:
+          LambdaArn: !GetAtt PreTokenGenLambda.Arn
+          LambdaVersion: V2_0
       UsernameAttributes:
         - email
       AutoVerifiedAttributes:
