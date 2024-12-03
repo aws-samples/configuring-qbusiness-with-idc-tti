@@ -125,6 +125,8 @@ def callback():
     code = request.args.get("code")
     if not code:
         return "The authorization code was not returned or is not accessible", 403
+    logger.debug(f"Step-1 Completed:\n{code}")
+    input("Press Enter to continue...")
     try:
         # ------------------------------------------------
         # | STEP (2): Get OIDC identity token            |
@@ -136,6 +138,8 @@ def callback():
             client_id=config["client_id"],
             client_secret=config["client_secret"]
         )
+        logger.debug(f"Step-2 Completed")
+        input("Press Enter to continue...")
         # ------------------------------------------------
         # | STEP (3): Get IDC STS context token          |
         # ------------------------------------------------
@@ -144,6 +148,8 @@ def callback():
             odic_data.id_token,
             region_name
         )
+        logger.debug(f"Step-3 Completed")
+        input("Press Enter to continue...")
         # ------------------------------------------------
         # | STEP (4): Get STS temporary credential       |
         # ------------------------------------------------
@@ -162,6 +168,8 @@ def callback():
                 credential=credential
             )
         login_user(user)
+        logger.debug(f"Step-4 Completed\n{credential}")
+        input("Press Enter to continue...")
         return redirect(url_for("chat"))
     except AccessHelperException as ex:
         logger.exception(ex.args[0])
